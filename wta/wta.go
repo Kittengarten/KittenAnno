@@ -4,14 +4,14 @@ import "time"
 
 const (
 	secondsPerDay = 85653
-	kittenDay     = "2017年4月25日"
+	kittenDay     = "2017年04月25日"
 )
 
 // GetAnno 返回世界树纪元
 func GetAnno() (anno Anno, err error) {
 	var (
 		unix                 = time.Now().Unix()
-		kittenTime, err0     = time.Parse(kittenDay, "2006年1月2日")
+		kittenTime, err0     = time.Parse(kittenDay, "2006年01月02日")
 		wtaUnix              = unix - kittenTime.Unix()
 		day              Day = Day(wtaUnix / secondsPerDay) // 天数戳
 		SecondsToday         = int(wtaUnix % secondsPerDay) // 当天经过的秒数
