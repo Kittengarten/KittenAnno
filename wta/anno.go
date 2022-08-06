@@ -1,6 +1,7 @@
 package wta
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -119,8 +120,8 @@ func (month Month) toYearMonth() (year Year, monthNumber int) {
 	for netMonth >= yearCycleFirstmonthMonth[i] && i < yearCycle {
 		i++
 	}
-	year = Year(int(yearCycleCount)*yearCycle + i - 1)            // 年数戳
-	monthNumber = int(netMonth - yearCycleFirstmonthMonth[i] + 1) // 月份
+	year = Year(int(yearCycleCount)*yearCycle + i - 1)              // 年数戳
+	monthNumber = int(netMonth - yearCycleFirstmonthMonth[i-1] + 1) // 月份
 	// 如果是闰年，月份序号整体减少 1
 	if !year.isCommonYear() {
 		monthNumber--
@@ -139,7 +140,7 @@ func (day Day) toMonthDay() (month Month, date int) {
 		i++
 	}
 	month = Month(int(monthCycleCount)*monthCycle + i - 1) // 月数戳
-	date = int(netDay - monthCycleFirstdayDay[i] + 1)      // 日期
+	date = int(netDay - monthCycleFirstdayDay[i-1] + 1)    // 日期
 	return
 }
 
@@ -205,9 +206,9 @@ func (number Number64) toYearString() string {
 		returnValue = yearConvertMemory[Circulate][1] + returnValue
 	}
 	if number == 1 {
-		return "世界树纪元元"
+		return "世界树纪元元年"
 	}
-	return "世界树纪元" + returnValue
+	return fmt.Sprintf("世界树纪元%s年", returnValue)
 }
 
 // 将月份数字转换为月份字符串

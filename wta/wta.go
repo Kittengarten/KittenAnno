@@ -12,7 +12,7 @@ func GetAnno() (anno Anno, err error) {
 	var (
 		unix                 = time.Now().Unix()
 		kittenTime, err0     = time.Parse("2006年01月02日", kittenDay)
-		wtaUnix              = unix - kittenTime.Unix()
+		wtaUnix              = 72*(unix-kittenTime.Unix()) + time.Now().UnixNano()%1000000000*72/1000000000
 		day              Day = Day(wtaUnix / secondsPerDay) // 天数戳
 		SecondsToday         = int(wtaUnix % secondsPerDay) // 当天经过的秒数
 	)
