@@ -60,7 +60,7 @@ func init() {
 // 计算闰年
 func yearCycleFirstmonthMonthCompute() {
 	yearCycleFirstmonthMonth[0] = 0
-	for i := 1; i <= yearCycle; i++ {
+	for i := 1; i < yearCycle; i++ {
 		if Year(i - 1).isCommonYear() {
 			yearCycleFirstmonthMonth[i] = (yearCycleFirstmonthMonth[i-1] + commonYearMonthCount)
 		} else {
