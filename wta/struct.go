@@ -17,11 +17,11 @@ type (
 
 // Anno 世界树纪元的时间结构体
 type Anno struct {
-	yearNumber  int64  // 年份的数字表示
-	monthNumber int    // 月份的数字表示
-	date        int    // 日期的数字表示
-	yearStr     string // 年份的文字表示
-	monthStr    string // 月份的文字表示
-	dayStr      string // 日期的文字表示
-	month       Luna   // 月份本身
+	YearNumber  int64  // 年份的数字表示
+	MonthNumber int    // 月份的数字表示
+	Date        int    // 日期的数字表示
+	YearStr     string // 年份的文字表示
+	MonthStr    string // 月份的文字表示
+	DayStr      string // 日期的文字表示
+	Month       Luna   // 月份本身
 }

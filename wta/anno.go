@@ -150,12 +150,12 @@ func (day Day) toAnno() (anno Anno) {
 		year, monthNumber       = month.toYearMonth()
 		yearNumber        int64 = int64(year) + 1
 	)
-	anno.yearNumber = yearNumber
-	anno.monthNumber = monthNumber
-	anno.date = date
-	anno.yearStr = Number64(yearNumber).toYearString()
-	anno.monthStr = Number(monthNumber).toMonthString()
-	anno.dayStr = Number(date).toDate()
+	anno.YearNumber = yearNumber
+	anno.MonthNumber = monthNumber
+	anno.Date = date
+	anno.YearStr = Number64(yearNumber).toYearString()
+	anno.MonthStr = Number(monthNumber).toMonthString()
+	anno.DayStr = Number(date).toDate()
 	return
 }
 
