@@ -24,4 +24,7 @@ type Anno struct {
 	MonthStr    string // 月份的文字表示
 	DayStr      string // 日期的文字表示
 	Month       Luna   // 月份本身
+	Hour        int    // 时
+	Minute      int    // 分
+	Second      int    // 秒
 }
