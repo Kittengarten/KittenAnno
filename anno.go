@@ -144,7 +144,7 @@ func (day Day) toMonthDay() (month Month, date int) {
 }
 
 // 将天数戳转换为完整的时间
-func (day Day) toString() (anno Anno) {
+func (day Day) toAnno() (anno Anno) {
 	var (
 		month, date             = day.toMonthDay()
 		year, monthNumber       = month.toYearMonth()
