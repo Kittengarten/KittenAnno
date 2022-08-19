@@ -117,7 +117,7 @@ func (month Month) toYearMonth() (year Year, monthNumber int) {
 		netMonth       = month % yearCycleMonthCount // 余下的不足一个周期的月数
 		i              = 0                           // 循环次数
 	)
-	for netMonth >= yearCycleFirstmonthMonth[i] && i < yearCycle {
+	for i < yearCycle && netMonth >= yearCycleFirstmonthMonth[i] {
 		i++
 	}
 	year = Year(int(yearCycleCount)*yearCycle + i - 1)              // 年数戳
@@ -136,7 +136,7 @@ func (day Day) toMonthDay() (month Month, date int) {
 		netDay          = day % monthCycleDayCount // 余下的不足一个周期的天数
 		i               = 0                        // 循环次数
 	)
-	for netDay >= monthCycleFirstdayDay[i] && i < monthCycle {
+	for i < monthCycle && netDay >= monthCycleFirstdayDay[i] {
 		i++
 	}
 	month = Month(int(monthCycleCount)*monthCycle + i - 1) // 月数戳
