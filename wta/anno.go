@@ -162,30 +162,11 @@ func (day Day) toAnno() (anno Anno) {
 
 // 将数字转换为中文数字
 func (number Number) toString() string {
-	switch number {
-	case 0:
-		return "〇"
-	case 1:
-		return "一"
-	case 2:
-		return "二"
-	case 3:
-		return "三"
-	case 4:
-		return "四"
-	case 5:
-		return "五"
-	case 6:
-		return "六"
-	case 7:
-		return "七"
-	case 8:
-		return "八"
-	case 9:
-		return "九"
-	default:
-		return ""
+	numbers := []string{"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"}
+	if 0 <= number && number <= 9 {
+		return numbers[number]
 	}
+	return ""
 }
 
 // 将年份数字转换为年份字符串
