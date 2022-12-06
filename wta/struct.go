@@ -27,4 +27,7 @@ type Anno struct {
 	Hour        int    // 时
 	Minute      int    // 分
 	Second      int    // 秒
+	Flower      string // 月份的代表花卉
+	Elemental   string // 月份的代表元灵
+	Imagery     string // 月份的代表元灵之意象
 }

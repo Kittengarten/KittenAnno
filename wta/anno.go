@@ -111,7 +111,7 @@ func (month Month) isCommonMonth() bool {
 }
 
 // 输出月数戳对应的年数戳、月份
-func (month Month) toYearMonth() (year Year, monthNumber int) {
+func (month Month) getYearMonth() (year Year, monthNumber int) {
 	var (
 		yearCycleCount = month / yearCycleMonthCount // 闰年周期数
 		netMonth       = month % yearCycleMonthCount // 余下的不足一个周期的月数
@@ -130,7 +130,7 @@ func (month Month) toYearMonth() (year Year, monthNumber int) {
 }
 
 // 输出天数戳对应的月数戳、日期
-func (day Day) toMonthDay() (month Month, date int) {
+func (day Day) getMonthDay() (month Month, date int) {
 	var (
 		monthCycleCount = day / monthCycleDayCount // 大月周期数
 		netDay          = day % monthCycleDayCount // 余下的不足一个周期的天数
@@ -147,16 +147,16 @@ func (day Day) toMonthDay() (month Month, date int) {
 // 将天数戳转换为完整的时间
 func (day Day) toAnno() (anno Anno) {
 	var (
-		month, date             = day.toMonthDay()
-		year, monthNumber       = month.toYearMonth()
+		month, date             = day.getMonthDay()
+		year, monthNumber       = month.getYearMonth()
 		yearNumber        int64 = int64(year) + 1
 	)
 	anno.YearNumber = yearNumber
 	anno.MonthNumber = monthNumber
 	anno.Date = date
-	anno.YearStr = Number64(yearNumber).toYearString()
-	anno.MonthStr = Number(monthNumber).toMonthString()
-	anno.DayStr = Number(date).toDate()
+	anno.YearStr = Number64(yearNumber).getYearString()
+	anno.MonthStr, anno.Elemental, anno.Imagery, anno.Flower = Number(monthNumber).getMonth()
+	anno.DayStr = Number(date).getDate()
 	return
 }
 
@@ -170,7 +170,7 @@ func (number Number) toString() string {
 }
 
 // 将年份数字转换为年份字符串
-func (number Number64) toYearString() string {
+func (number Number64) getYearString() string {
 	var (
 		yearLength        = len(strconv.FormatInt(int64(number), 10))
 		yearConvertMemory = make([][]string, yearLength) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
@@ -192,72 +192,72 @@ func (number Number64) toYearString() string {
 	return fmt.Sprintf("世界树纪元%s年", returnValue)
 }
 
-// 将月份数字转换为月份字符串
-func (number Number) toMonthString() string {
+// 将月份数字转换为月份字符串、元灵、意象和花卉
+func (number Number) getMonth() (string, string, string, string) {
 	switch Luna(number) {
 	case 寂月:
-		return "寂月"
+		return "寂月", "死亡", "祈歌", "烟花"
 	case 雪月:
-		return "雪月"
+		return "雪月", "风雪", "飘荡", "山茶"
 	case 海月:
-		return "海月"
+		return "海月", "海洋", "深沉", "金花茶"
 	case 夜月:
-		return "夜月"
+		return "夜月", "暗夜", "虚乏", "墨兰"
 	case 彗月:
-		return "彗月"
+		return "彗月", "流星", "陨落", "腊梅"
 	case 凉月:
-		return "凉月"
+		return "凉月", "寒冰", "凝聚", "迷迭香"
 	case 芷月:
-		return "芷月"
+		return "芷月", "凛冬", "休憩", "茶花"
 	case 茸月:
-		return "茸月"
+		return "茸月", "河流", "苏醒", "春兰"
 	case 雨月:
-		return "雨月"
+		return "雨月", "雨露", "降临", "油菜花"
 	case 花月:
-		return "花月"
+		return "花月", "繁花", "盛开", "拟南芥"
 	case 梦月:
-		return "梦月"
+		return "梦月", "梦幻", "轨迹", "郁金香"
 	case 音月:
-		return "音月"
+		return "音月", "韵律", "共鸣", "风信子"
 	case 晴月:
-		return "晴月"
+		return "晴月", "云朵", "弥散", "紫罗兰"
 	case 岚月:
-		return "岚月"
+		return "岚月", "和春", "离去", "鸢尾"
 	case 萝月:
-		return "萝月"
+		return "萝月", "生命", "吟唱", "矢车菊"
 	case 苏月:
-		return "苏月"
+		return "苏月", "森林", "幽郁", "虞美人"
 	case 茜月:
-		return "茜月"
+		return "茜月", "田野", "丰饶", "栀子"
 	case 梨月:
-		return "梨月"
+		return "梨月", "明昼", "迷离", "薰衣草"
 	case 荷月:
-		return "荷月"
+		return "荷月", "湖泊", "静谧", "莲花"
 	case 茶月:
-		return "茶月"
+		return "茶月", "火焰", "灼烈", "满天星"
 	case 茉月:
-		return "茉月"
+		return "茉月", "炎夏", "告别", "茉莉"
 	case 铃月:
-		return "铃月"
+		return "铃月", "城市", "回响", "紫菀"
 	case 信月:
-		return "信月"
+		return "信月", "星辰", "守序", "桔梗"
 	case 瑶月:
-		return "瑶月"
+		return "瑶月", "时间", "归来", "素馨"
 	case 风月:
-		return "风月"
+		return "风月", "天空", "呓语", "桂花"
 	case 叶月:
-		return "叶月"
+		return "叶月", "大地", "呼唤", "芙蓉"
 	case 霜月:
-		return "霜月"
+		return "霜月", "山脉", "厚重", "菊花"
 	case 奈月:
-		return "奈月"
+		return "奈月", "清秋", "消逝", "油茶"
 	default:
-		return ""
+		return "", "", "", ""
 	}
 }
 
 // 将日期数字转换为日期字符串
-func (number Number) toDate() string {
+func (number Number) getDate() string {
 	var dayConvertMemory = make([][]string, 2) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
 	for i := range dayConvertMemory {
 		dayConvertMemory[i] = make([]string, 2)
