@@ -14,6 +14,7 @@ const (
 	cycleGreaterMonthCount = 3                                                       // 每周期的大月数
 	yearCycleMonthCount    = yearCycle*commonYearMonthCount + cycleLeapYearCount     // 闰年周期的月数
 	monthCycleDayCount     = monthCycle*commonMonthDayCount + cycleGreaterMonthCount // 大月周期的天数
+	numberString           = "〇一二三四五六七八九"                                            // 数字对应的字符
 )
 
 const (
@@ -162,9 +163,8 @@ func (day Day) toAnno() (anno Anno) {
 
 // 将数字转换为中文数字
 func (number Number) toString() string {
-	numbers := []string{"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"}
 	if 0 <= number && number <= 9 {
-		return numbers[number]
+		return numberString[number : number+1]
 	}
 	return ""
 }
