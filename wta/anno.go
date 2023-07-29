@@ -14,7 +14,7 @@ const (
 	cycleGreaterMonthCount = 3                                                       // 每周期的大月数
 	yearCycleMonthCount    = yearCycle*commonYearMonthCount + cycleLeapYearCount     // 闰年周期的月数
 	monthCycleDayCount     = monthCycle*commonMonthDayCount + cycleGreaterMonthCount // 大月周期的天数
-	numberString           = "〇一二三四五六七八九"                                            // 数字对应的字符
+	numberString           = `〇一二三四五六七八九`                                            // 数字对应的字符
 )
 
 const (
@@ -51,6 +51,36 @@ const (
 var (
 	yearCycleFirstmonthMonth [yearCycle]Month // 闰年周期中，每年的首月所处的月数戳
 	monthCycleFirstdayDay    [monthCycle]Day  // 大月周期中，每月的首日所处的天数戳
+	monthInfo                = map[Luna]MonthInfo{
+		寂月: {`寂月`, `死亡`, `祈歌`, `烟花`},
+		雪月: {`雪月`, `风雪`, `飘荡`, `山茶`},
+		海月: {`海月`, `海洋`, `深沉`, `金花茶`},
+		夜月: {`夜月`, `暗夜`, `虚乏`, `墨兰`},
+		彗月: {`彗月`, `流星`, `陨落`, `腊梅`},
+		凉月: {`凉月`, `寒冰`, `凝聚`, `迷迭香`},
+		芷月: {`芷月`, `凛冬`, `休憩`, `茶花`},
+		茸月: {`茸月`, `河流`, `苏醒`, `春兰`},
+		雨月: {`雨月`, `雨露`, `降临`, `油菜花`},
+		花月: {`花月`, `繁花`, `盛开`, `拟南芥`},
+		梦月: {`梦月`, `梦幻`, `轨迹`, `郁金香`},
+		音月: {`音月`, `韵律`, `共鸣`, `风信子`},
+		晴月: {`晴月`, `云朵`, `弥散`, `紫罗兰`},
+		岚月: {`岚月`, `和春`, `离去`, `鸢尾`},
+		萝月: {`萝月`, `生命`, `吟唱`, `矢车菊`},
+		苏月: {`苏月`, `森林`, `幽郁`, `虞美人`},
+		茜月: {`茜月`, `田野`, `丰饶`, `栀子`},
+		梨月: {`梨月`, `明昼`, `迷离`, `薰衣草`},
+		荷月: {`荷月`, `湖泊`, `静谧`, `莲花`},
+		茶月: {`茶月`, `火焰`, `灼烈`, `满天星`},
+		茉月: {`茉月`, `炎夏`, `告别`, `茉莉`},
+		铃月: {`铃月`, `城市`, `回响`, `紫菀`},
+		信月: {`信月`, `星辰`, `守序`, `桔梗`},
+		瑶月: {`瑶月`, `时间`, `归来`, `素馨`},
+		风月: {`风月`, `天空`, `呓语`, `桂花`},
+		叶月: {`叶月`, `大地`, `呼唤`, `芙蓉`},
+		霜月: {`霜月`, `山脉`, `厚重`, `菊花`},
+		奈月: {`奈月`, `清秋`, `消逝`, `油茶`},
+	}
 )
 
 // 计算出闰年和大月
@@ -62,7 +92,7 @@ func init() {
 // 计算闰年
 func yearCycleFirstmonthMonthCompute() {
 	yearCycleFirstmonthMonth[0] = 0
-	for i := 1; i < yearCycle; i++ {
+	for i := 1; yearCycle > i; i++ {
 		if Year(i - 1).isCommonYear() {
 			yearCycleFirstmonthMonth[i] = (yearCycleFirstmonthMonth[i-1] + commonYearMonthCount)
 		} else {
@@ -88,7 +118,7 @@ func (year Year) isCommonYear() bool {
 // 计算大月
 func monthCycleFirstdayDayCompute() {
 	monthCycleFirstdayDay[0] = 0
-	for i := 1; i < monthCycle; i++ {
+	for i := 1; monthCycle > i; i++ {
 		if Month(i - 1).isCommonMonth() {
 			monthCycleFirstdayDay[i] = (monthCycleFirstdayDay[i-1] + commonMonthDayCount)
 		} else {
@@ -118,7 +148,7 @@ func (month Month) getYearMonth() (year Year, monthNumber int) {
 		netMonth       = month % yearCycleMonthCount // 余下的不足一个周期的月数
 		i              = 0                           // 循环次数
 	)
-	for i < yearCycle && netMonth >= yearCycleFirstmonthMonth[i] {
+	for yearCycle > i && netMonth >= yearCycleFirstmonthMonth[i] {
 		i++
 	}
 	year = Year(int(yearCycleCount)*yearCycle + i - 1)              // 年数戳
@@ -137,7 +167,7 @@ func (day Day) getMonthDay() (month Month, date int) {
 		netDay          = day % monthCycleDayCount // 余下的不足一个周期的天数
 		i               = 0                        // 循环次数
 	)
-	for i < monthCycle && netDay >= monthCycleFirstdayDay[i] {
+	for monthCycle > i && netDay >= monthCycleFirstdayDay[i] {
 		i++
 	}
 	month = Month(int(monthCycleCount)*monthCycle + i - 1) // 月数戳
@@ -156,17 +186,17 @@ func (day Day) toAnno() (anno Anno) {
 	anno.MonthNumber = monthNumber
 	anno.Date = date
 	anno.YearStr = Number64(yearNumber).getYearString()
-	anno.MonthStr, anno.Elemental, anno.Imagery, anno.Flower = Number(monthNumber).getMonth()
+	anno.MonthInfo = Number(monthNumber).getMonth()
 	anno.DayStr = Number(date).getDate()
 	return
 }
 
 // 将数字转换为中文数字
 func (number Number) toString() string {
-	if 0 <= number && number <= 9 {
-		return numberString[number : number+1]
+	if 0 <= number && 9 >= number {
+		return numberString[3*number : 3*number+3]
 	}
-	return ""
+	return ``
 }
 
 // 将年份数字转换为年份字符串
@@ -174,7 +204,7 @@ func (number Number64) getYearString() string {
 	var (
 		yearLength        = len(strconv.FormatInt(int64(number), 10))
 		yearConvertMemory = make([][]string, yearLength) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
-		returnValue       = ""
+		returnValue       = ``
 	)
 	for i := range yearConvertMemory {
 		yearConvertMemory[i] = make([]string, 2)
@@ -187,73 +217,15 @@ func (number Number64) getYearString() string {
 		returnValue = yearConvertMemory[Circulate][1] + returnValue
 	}
 	if number == 1 {
-		return "世界树纪元元年"
+		return `世界树纪元元年`
 	}
 	return fmt.Sprintf("世界树纪元%s年", returnValue)
 }
 
-// 将月份数字转换为月份字符串、元灵、意象和花卉
-func (number Number) getMonth() (string, string, string, string) {
-	switch Luna(number) {
-	case 寂月:
-		return "寂月", "死亡", "祈歌", "烟花"
-	case 雪月:
-		return "雪月", "风雪", "飘荡", "山茶"
-	case 海月:
-		return "海月", "海洋", "深沉", "金花茶"
-	case 夜月:
-		return "夜月", "暗夜", "虚乏", "墨兰"
-	case 彗月:
-		return "彗月", "流星", "陨落", "腊梅"
-	case 凉月:
-		return "凉月", "寒冰", "凝聚", "迷迭香"
-	case 芷月:
-		return "芷月", "凛冬", "休憩", "茶花"
-	case 茸月:
-		return "茸月", "河流", "苏醒", "春兰"
-	case 雨月:
-		return "雨月", "雨露", "降临", "油菜花"
-	case 花月:
-		return "花月", "繁花", "盛开", "拟南芥"
-	case 梦月:
-		return "梦月", "梦幻", "轨迹", "郁金香"
-	case 音月:
-		return "音月", "韵律", "共鸣", "风信子"
-	case 晴月:
-		return "晴月", "云朵", "弥散", "紫罗兰"
-	case 岚月:
-		return "岚月", "和春", "离去", "鸢尾"
-	case 萝月:
-		return "萝月", "生命", "吟唱", "矢车菊"
-	case 苏月:
-		return "苏月", "森林", "幽郁", "虞美人"
-	case 茜月:
-		return "茜月", "田野", "丰饶", "栀子"
-	case 梨月:
-		return "梨月", "明昼", "迷离", "薰衣草"
-	case 荷月:
-		return "荷月", "湖泊", "静谧", "莲花"
-	case 茶月:
-		return "茶月", "火焰", "灼烈", "满天星"
-	case 茉月:
-		return "茉月", "炎夏", "告别", "茉莉"
-	case 铃月:
-		return "铃月", "城市", "回响", "紫菀"
-	case 信月:
-		return "信月", "星辰", "守序", "桔梗"
-	case 瑶月:
-		return "瑶月", "时间", "归来", "素馨"
-	case 风月:
-		return "风月", "天空", "呓语", "桂花"
-	case 叶月:
-		return "叶月", "大地", "呼唤", "芙蓉"
-	case 霜月:
-		return "霜月", "山脉", "厚重", "菊花"
-	case 奈月:
-		return "奈月", "清秋", "消逝", "油茶"
-	default:
-		return "", "", "", ""
-	}
+// 将月份数字转换为月份信息
+func (number Number) getMonth() MonthInfo {
+	return monthInfo[Luna(number)]
+
 }
 
 // 将日期数字转换为日期字符串
@@ -265,24 +237,21 @@ func (number Number) getDate() string {
 	dayConvertMemory[1][0] = strconv.Itoa(int(number) / 10)
 	dayConvertMemory[0][0] = strconv.Itoa(int(number) % 10)
 	switch dayConvertMemory[1][0] {
-	case "0":
-		dayConvertMemory[1][1] = "初"
-		break
-	case "1":
-		dayConvertMemory[1][1] = "十"
-		break
-	case "2":
-		dayConvertMemory[1][1] = "廿"
-		break
+	case `0`:
+		dayConvertMemory[1][1] = `初`
+	case `1`:
+		dayConvertMemory[1][1] = `十`
+	case `2`:
+		dayConvertMemory[1][1] = `廿`
 	default:
-		dayConvertMemory[1][1] = ""
+		dayConvertMemory[1][1] = ``
 	}
 	dayConvertMemory[0][1] = (number % 10).toString()
 	switch number {
 	case 10:
-		return "初十"
+		return `初十`
 	case 20:
-		return "二十"
+		return `二十`
 	default:
 		return dayConvertMemory[1][1] + dayConvertMemory[0][1]
 	}

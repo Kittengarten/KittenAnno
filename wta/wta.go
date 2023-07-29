@@ -9,14 +9,13 @@ const (
 
 // GetAnno 返回世界树纪元
 func GetAnno() (anno Anno, err error) {
+	kittenTime, err := time.Parse("2006年01月02日", kittenDay)
 	var (
-		unix                 = time.Now().Unix()
-		kittenTime, err0     = time.Parse("2006年01月02日", kittenDay)
-		wtaUnix              = 72*(unix-kittenTime.Unix()) + time.Now().UnixNano()%1000000000*72/1000000000
-		day              Day = Day(wtaUnix / secondsPerDay) // 天数戳
-		SecondsToday         = int(wtaUnix % secondsPerDay) // 当天经过的秒数
+		unix             = time.Now().Unix()
+		wtaUnix          = 72*(unix-kittenTime.Unix()) + time.Now().UnixNano()%1000000000*72/1000000000
+		day          Day = Day(wtaUnix / secondsPerDay) // 天数戳
+		SecondsToday     = int(wtaUnix % secondsPerDay) // 当天经过的秒数
 	)
-	err = err0
 	anno = day.toAnno()
 	anno.Hour = SecondsToday / 3600
 	anno.Minute = (SecondsToday % 3600) / 60

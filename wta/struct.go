@@ -21,13 +21,18 @@ type Anno struct {
 	MonthNumber int    // 月份的数字表示
 	Date        int    // 日期的数字表示
 	YearStr     string // 年份的文字表示
-	MonthStr    string // 月份的文字表示
+	MonthInfo          // 月份信息结构体
 	DayStr      string // 日期的文字表示
 	Month       Luna   // 月份本身
 	Hour        int    // 时
 	Minute      int    // 分
 	Second      int    // 秒
-	Flower      string // 月份的代表花卉
-	Elemental   string // 月份的代表元灵
-	Imagery     string // 月份的代表元灵之意象
+}
+
+// MonthInfo 世界树纪元的月份信息结构体
+type MonthInfo struct {
+	MonthStr  string // 月份的文字表示
+	Elemental string // 月份的代表元灵
+	Imagery   string // 月份的代表元灵之意象
+	Flower    string // 月份的代表花卉
 }
