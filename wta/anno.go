@@ -211,7 +211,7 @@ func (day Day) toAnno() (anno Anno) {
 		YearNumber:  int64(yearNumber),
 		MonthNumber: int8(monthNumber),
 		Date:        int8(date),
-		YearStr:     yearNumber.getYearString(),
+		YearStr:     yearNumber.getYear(),
 		MonthInfo:   monthNumber.getMonth(),
 		DayStr:      date.getDate(),
 		ChordStr:    chord[chordNumber],
@@ -227,8 +227,8 @@ func (n Number[T]) toString() string {
 	return ``
 }
 
-// 将年份数字转换为年份字符串
-func (a Annual) getYearString() string {
+// 将年份转换为年份字符串
+func (a Annual) getYear() string {
 	var (
 		yearLength        = len(strconv.FormatInt(int64(a), 10))
 		yearConvertMemory = make([][]string, yearLength) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
@@ -256,7 +256,7 @@ func (m Luna) getMonth() MonthInfo {
 
 }
 
-// 将日期数字转换为日期字符串
+// 将日期转换为日期字符串
 func (d Date) getDate() string {
 	var dayConvertMemory = make([][]string, 2) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
 	for i := range dayConvertMemory {
