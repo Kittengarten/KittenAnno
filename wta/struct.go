@@ -7,26 +7,30 @@ type (
 	Month int64
 	// Day 天数戳
 	Day int64
-	// Number64 是一个 int64
-	Number64 int64
-	// Number 是一个 int
-	Number int
+	// Annual 世界树纪元年份
+	Annual int64
 	// Luna 世界树纪元月份
-	Luna int
+	Luna int8
+	// Date 世界树纪元日期
+	Date int8
+	// Chord 世界树纪元琴弦
+	Chord int8
+	// Number 是一个可转换为中文的数字
+	Number[T Annual | Date] int64
 )
 
 // Anno 世界树纪元的时间结构体
 type Anno struct {
 	YearNumber  int64  // 年份的数字表示
-	MonthNumber int    // 月份的数字表示
-	Date        int    // 日期的数字表示
+	MonthNumber int8   // 月份的数字表示
+	Date        int8   // 日期的数字表示
 	YearStr     string // 年份的文字表示
 	MonthInfo          // 月份信息结构体
 	DayStr      string // 日期的文字表示
-	Month       Luna   // 月份本身
-	Hour        int    // 时
-	Minute      int    // 分
-	Second      int    // 秒
+	ChordStr    string // 琴弦的文字表示
+	Hour        int8   // 时
+	Minute      int8   // 分
+	Second      int8   // 秒
 }
 
 // MonthInfo 世界树纪元的月份信息结构体

@@ -48,10 +48,23 @@ const (
 	奈月
 )
 
+const (
+	折纸 Chord = iota + 1
+	赤空
+	玉兰
+	水光
+	风荧
+	玄冰
+	月海
+	日珥
+	星灯
+)
+
 var (
 	yearCycleFirstmonthMonth [yearCycle]Month // 闰年周期中，每年的首月所处的月数戳
 	monthCycleFirstdayDay    [monthCycle]Day  // 大月周期中，每月的首日所处的天数戳
-	monthInfo                = map[Luna]MonthInfo{
+
+	monthInfo = map[Luna]MonthInfo{
 		寂月: {`寂月`, `死亡`, `祈歌`, `烟花`},
 		雪月: {`雪月`, `风雪`, `飘荡`, `山茶`},
 		海月: {`海月`, `海洋`, `深沉`, `金花茶`},
@@ -81,6 +94,17 @@ var (
 		霜月: {`霜月`, `山脉`, `厚重`, `菊花`},
 		奈月: {`奈月`, `清秋`, `消逝`, `油茶`},
 	}
+	chord = map[Chord]string{
+		折纸: `折纸`,
+		赤空: `赤空`,
+		玉兰: `玉兰`,
+		水光: `水光`,
+		风荧: `风荧`,
+		玄冰: `玄冰`,
+		月海: `月海`,
+		日珥: `日珥`,
+		星灯: `星灯`,
+	}
 )
 
 // 计算出闰年和大月
@@ -107,8 +131,8 @@ func (year Year) isCommonYear() bool {
 		netYear = year % yearCycle
 		years   = []Year{1, 4, 7, 10, 13, 15, 18, 21, 24, 27}
 	)
-	for _, v := range years {
-		if netYear == v {
+	for k := range years {
+		if netYear == years[k] {
 			return false
 		}
 	}
@@ -142,7 +166,7 @@ func (month Month) isCommonMonth() bool {
 }
 
 // 输出月数戳对应的年数戳、月份
-func (month Month) getYearMonth() (year Year, monthNumber int) {
+func (month Month) getYearMonth() (year Year, monthNumber Luna) {
 	var (
 		yearCycleCount = month / yearCycleMonthCount // 闰年周期数
 		netMonth       = month % yearCycleMonthCount // 余下的不足一个周期的月数
@@ -151,8 +175,8 @@ func (month Month) getYearMonth() (year Year, monthNumber int) {
 	for yearCycle > i && netMonth >= yearCycleFirstmonthMonth[i] {
 		i++
 	}
-	year = Year(int(yearCycleCount)*yearCycle + i - 1)              // 年数戳
-	monthNumber = int(netMonth - yearCycleFirstmonthMonth[i-1] + 1) // 月份
+	year = Year(int(yearCycleCount)*yearCycle + i - 1)               // 年数戳
+	monthNumber = Luna(netMonth - yearCycleFirstmonthMonth[i-1] + 1) // 月份
 	// 如果是闰年，月份序号整体减少 1
 	if !year.isCommonYear() {
 		monthNumber--
@@ -161,7 +185,7 @@ func (month Month) getYearMonth() (year Year, monthNumber int) {
 }
 
 // 输出天数戳对应的月数戳、日期
-func (day Day) getMonthDay() (month Month, date int) {
+func (day Day) getMonthDay() (month Month, date Date) {
 	var (
 		monthCycleCount = day / monthCycleDayCount // 大月周期数
 		netDay          = day % monthCycleDayCount // 余下的不足一个周期的天数
@@ -171,71 +195,75 @@ func (day Day) getMonthDay() (month Month, date int) {
 		i++
 	}
 	month = Month(int(monthCycleCount)*monthCycle + i - 1) // 月数戳
-	date = int(netDay - monthCycleFirstdayDay[i-1] + 1)    // 日期
+	date = Date(netDay - monthCycleFirstdayDay[i-1] + 1)   // 日期
 	return
 }
 
 // 将天数戳转换为完整的时间
 func (day Day) toAnno() (anno Anno) {
 	var (
-		month, date             = day.getMonthDay()
-		year, monthNumber       = month.getYearMonth()
-		yearNumber        int64 = int64(year) + 1
+		month, date              = day.getMonthDay()
+		year, monthNumber        = month.getYearMonth()
+		yearNumber        Annual = Annual(year) + 1
+		chordNumber       Chord  = Chord(day%9 + 1)
 	)
-	anno.YearNumber = yearNumber
-	anno.MonthNumber = monthNumber
-	anno.Date = date
-	anno.YearStr = Number64(yearNumber).getYearString()
-	anno.MonthInfo = Number(monthNumber).getMonth()
-	anno.DayStr = Number(date).getDate()
+	anno = Anno{
+		YearNumber:  int64(yearNumber),
+		MonthNumber: int8(monthNumber),
+		Date:        int8(date),
+		YearStr:     yearNumber.getYearString(),
+		MonthInfo:   monthNumber.getMonth(),
+		DayStr:      date.getDate(),
+		ChordStr:    chord[chordNumber],
+	}
 	return
 }
 
 // 将数字转换为中文数字
-func (number Number) toString() string {
-	if 0 <= number && 9 >= number {
-		return numberString[3*number : 3*number+3]
+func (n Number[T]) toString() string {
+	if 0 <= n && 9 >= n {
+		return numberString[3*n : 3*n+3]
 	}
 	return ``
 }
 
 // 将年份数字转换为年份字符串
-func (number Number64) getYearString() string {
+func (a Annual) getYearString() string {
 	var (
-		yearLength        = len(strconv.FormatInt(int64(number), 10))
+		yearLength        = len(strconv.FormatInt(int64(a), 10))
 		yearConvertMemory = make([][]string, yearLength) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
 		returnValue       = ``
 	)
 	for i := range yearConvertMemory {
 		yearConvertMemory[i] = make([]string, 2)
 	}
-	for i := int64(number); i > 0; i /= 10 {
+	for i := a; i > 0; i /= 10 {
 		Circulate := 0 // 0 表示个位，1 表示十位，以此类推
 		v := i % 10
-		yearConvertMemory[Circulate][0] = strconv.FormatInt(v, 10)
-		yearConvertMemory[Circulate][1] = Number(v).toString()
+		yearConvertMemory[Circulate][0] = strconv.FormatInt(int64(v), 10)
+		yearConvertMemory[Circulate][1] = Number[Annual](v).toString()
 		returnValue = yearConvertMemory[Circulate][1] + returnValue
 	}
-	if number == 1 {
+	if a == 1 {
 		return `世界树纪元元年`
 	}
 	return fmt.Sprintf("世界树纪元%s年", returnValue)
 }
 
-// 将月份数字转换为月份信息
-func (number Number) getMonth() MonthInfo {
-	return monthInfo[Luna(number)]
+// 将月份转换为月份信息
+func (m Luna) getMonth() MonthInfo {
+	return monthInfo[m]
 
 }
 
 // 将日期数字转换为日期字符串
-func (number Number) getDate() string {
+func (d Date) getDate() string {
 	var dayConvertMemory = make([][]string, 2) // 第一维表示位，第二维表示内容（0 为数字原文，1 为转换后的内容）
 	for i := range dayConvertMemory {
 		dayConvertMemory[i] = make([]string, 2)
 	}
-	dayConvertMemory[1][0] = strconv.Itoa(int(number) / 10)
-	dayConvertMemory[0][0] = strconv.Itoa(int(number) % 10)
+	dayConvertMemory[1][0] = strconv.Itoa(int(d) / 10)
+	dayConvertMemory[0][0] = strconv.Itoa(int(d) % 10)
 	switch dayConvertMemory[1][0] {
 	case `0`:
 		dayConvertMemory[1][1] = `初`
@@ -246,8 +274,8 @@ func (number Number) getDate() string {
 	default:
 		dayConvertMemory[1][1] = ``
 	}
-	dayConvertMemory[0][1] = (number % 10).toString()
-	switch number {
+	dayConvertMemory[0][1] = Number[Date](d % 10).toString()
+	switch d {
 	case 10:
 		return `初十`
 	case 20:
