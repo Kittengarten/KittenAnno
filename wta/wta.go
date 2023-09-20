@@ -6,24 +6,24 @@ import (
 )
 
 const (
-	secondsPerDay = 85653
-	kittenDay     = "2017年04月25日"
+	wtaDay    = 85653 * time.Second
+	kittenDay = `2017-04-25 00:00:00`
 )
 
+var kittenTime, err = time.Parse(time.DateTime, kittenDay)
+
 // GetAnno 返回世界树纪元
-func GetAnno() (anno Anno, err error) {
-	kittenTime, err := time.Parse("2006年01月02日", kittenDay)
+func GetAnno() (Anno, error) {
 	var (
-		unix             = time.Now().Unix()
-		wtaUnix          = 72*(unix-kittenTime.Unix()) + time.Now().UnixNano()%1000000000*72/1000000000
-		day          Day = Day(wtaUnix / secondsPerDay) // 天数戳
-		SecondsToday     = int(wtaUnix % secondsPerDay) // 当天经过的秒数
+		t            = time.Since(kittenTime)                        // 地球时间
+		day          = Day(72 * float64(t) / float64(wtaDay))        // 天数戳
+		SecondsToday = int32((72 * (t % wtaDay) % wtaDay).Seconds()) // 当天经过的秒数
 	)
-	anno = day.toAnno()
-	anno.Hour = int8(SecondsToday / 3600)
-	anno.Minute = int8(SecondsToday % 3600 / 60)
-	anno.Second = int8(SecondsToday % 3600 % 60)
-	return
+	anno := day.toAnno()
+	anno.Hour = uint8(SecondsToday / 3600)
+	anno.Minute = uint8(SecondsToday % 3600 / 60)
+	anno.Second = uint8(SecondsToday % 3600 % 60)
+	return anno, err
 }
 
 // GetAnnoStr 返回世界树纪元文字表示
