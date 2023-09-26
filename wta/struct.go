@@ -1,7 +1,7 @@
 package wta
 
 const (
-	寂月 Luna = iota
+	寂月 uint8 = iota
 	雪月
 	海月
 	夜月
@@ -32,7 +32,7 @@ const (
 )
 
 const (
-	折纸 Chord = 1 + iota
+	折纸 uint8 = 1 + iota
 	赤空
 	玉兰
 	水光
@@ -44,7 +44,7 @@ const (
 )
 
 var (
-	monthInfo = map[Luna]MonthInfo{
+	monthInfoMap = map[uint8]monthInfo{
 		寂月: {`寂月`, `死亡`, `祈歌`, `烟花`},
 		雪月: {`雪月`, `风雪`, `飘荡`, `山茶`},
 		海月: {`海月`, `海洋`, `深沉`, `金花茶`},
@@ -74,7 +74,7 @@ var (
 		霜月: {`霜月`, `山脉`, `厚重`, `菊花`},
 		奈月: {`奈月`, `清秋`, `消逝`, `油茶`},
 	}
-	chord = map[Chord]string{
+	chordStrMap = map[uint8]string{
 		折纸: `折纸`,
 		赤空: `赤空`,
 		玉兰: `玉兰`,
@@ -88,47 +88,60 @@ var (
 )
 
 type (
-	// Year 年数戳
-	Year uint64
-	// Month 月数戳
-	Month uint64
-	// Day 天数戳
-	Day uint64
-	// Annual 世界树纪元年份
-	Annual uint64
-	// Luna 世界树纪元月份
-	Luna uint8
-	// Date 世界树纪元日期
-	Date uint8
-	// Chord 世界树纪元琴弦
-	Chord uint8
-	// Number 是一个可转换为中文的数字
-	Number[T Annual | Date] uint64
-	// Duration 世界树纪元时间间隔的纳秒数
-	Duration int64
-
-	// Time 世界树纪元的时间结构体
-	Time struct {
-		sec uint64 // 秒数戳
+	// Year  世界树纪元的年
+	year struct {
+		calendar[uint64]
+		IsCommon bool
 	}
 
-	// Anno 世界树纪元的时间表示结构体
+	// Month 世界树纪元的月
+	month struct {
+		elemental, imagery, flower string // 月份的代表元灵及其意象、花卉
+		calendar[uint8]
+		IsCommon bool
+	}
+
+	// Day 世界树纪元的月份信息
+	monthInfo struct {
+		str, elemental, imagery, flower string // 月份的文字表示、代表元灵及其意象、花卉
+	}
+
+	// 世界树纪元的日
+	day struct {
+		calendar[uint8]
+		chord
+	}
+
+	// 世界树纪元琴弦
+	chord struct {
+		str    string // 文字
+		number uint8  // 数字
+	}
+
+	calendar[T number] struct {
+		str    string // 文字
+		stamp  uint64 // 时间戳
+		number T      // 数字
+	}
+
+	number interface {
+		~int | ~int8 | ~int16 | ~int32 | ~int64 |
+			~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+	}
+
+	// Anno 世界树纪元的完整表示
 	Anno struct {
-		AnnoStr                                        // 文字表示
-		YearNumber                              uint64 // 年份的数字表示
-		MonthNumber, Date, Hour, Minute, Second uint8  // 月份、日期、时、分、秒的数字表示
+		year                       // 年
+		month                      // 月
+		day                        // 日
+		hour, minute, second uint8 // 时、分、秒的数字表示
 	}
 
-	// AnnoStr 世界树纪元的文字表示
-	AnnoStr struct {
-		YearStr   string // 年份的文字表示
-		MonthInfo        // 月份信息结构体
-		DayStr    string // 日期的文字表示
-		ChordStr  string // 琴弦的文字表示
-	}
-
-	// MonthInfo 世界树纪元的月份信息结构体
-	MonthInfo struct {
-		MonthStr, Elemental, Imagery, Flower string // 月份的文字表示、代表元灵及其意象、花卉
-	}
+	// // 世界树纪元接口
+	// Anno interface {
+	// 	GetStrSplit() (annoStr, chordStr string)
+	// 	GetYear() year
+	// 	GetMonth() month
+	// 	GetDay() day
+	// }
 )
