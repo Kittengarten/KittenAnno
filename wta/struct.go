@@ -1,5 +1,7 @@
 package wta
 
+import of "golang.org/x/exp/constraints"
+
 const (
 	寂月 uint8 = iota
 	雪月
@@ -88,20 +90,20 @@ var (
 )
 
 type (
-	// Year  世界树纪元的年
+	// year  世界树纪元的年
 	year struct {
 		calendar[uint64]
 		IsCommon bool
 	}
 
-	// Month 世界树纪元的月
+	// month 世界树纪元的月
 	month struct {
 		elemental, imagery, flower string // 月份的代表元灵及其意象、花卉
 		calendar[uint8]
 		IsCommon bool
 	}
 
-	// Day 世界树纪元的月份信息
+	// monthInfo 世界树纪元的月份信息
 	monthInfo struct {
 		str, elemental, imagery, flower string // 月份的文字表示、代表元灵及其意象、花卉
 	}
@@ -124,10 +126,7 @@ type (
 		number T      // 数字
 	}
 
-	number interface {
-		~int | ~int8 | ~int16 | ~int32 | ~int64 |
-			~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
-	}
+	number of.Integer
 
 	// Anno 世界树纪元的完整表示
 	Anno struct {
@@ -136,12 +135,4 @@ type (
 		day                        // 日
 		hour, minute, second uint8 // 时、分、秒的数字表示
 	}
-
-	// // 世界树纪元接口
-	// Anno interface {
-	// 	GetStrSplit() (annoStr, chordStr string)
-	// 	GetYear() year
-	// 	GetMonth() month
-	// 	GetDay() day
-	// }
 )

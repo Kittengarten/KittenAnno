@@ -14,12 +14,15 @@ const (
 	cycleGreaterMonthCount = 3                                                       // 每周期的大月数
 	yearCycleMonthCount    = yearCycle*commonYearMonthCount + cycleLeapYearCount     // 闰年周期的月数
 	monthCycleDayCount     = monthCycle*commonMonthDayCount + cycleGreaterMonthCount // 大月周期的天数
-	numberString           = `〇一二三四五六七八九`                                            // 数字对应的字符
+
+	numberString = `〇一二三四五六七八九` // 数字对应的字符
 )
 
 var (
-	yearCycleFirstmonthMonth [yearCycle]uint16  // 闰年周期中，每年的首月所处的月数戳
-	monthCycleFirstdayDay    [monthCycle]uint16 // 大月周期中，每月的首日所处的天数戳
+	leapYear                 = []int8{1, 4, 7, 10, 13, 15, 18, 21, 24, 27} // 每周期的闰年
+	longMonth                = []int8{1, 4, 8}                             // 每周期的大月
+	yearCycleFirstmonthMonth [yearCycle]uint16                             // 闰年周期中，每年的首月所处的月数戳
+	monthCycleFirstdayDay    [monthCycle]uint16                            // 大月周期中，每月的首日所处的天数戳
 )
 
 // 计算出闰年和大月
@@ -33,8 +36,13 @@ func yearCycleFirstmonthMonthCompute() {
 	yearCycleFirstmonthMonth[0] = 0
 	for i := range [yearCycle - 1]struct{}{} {
 		yearCycleFirstmonthMonth[i+1] = yearCycleFirstmonthMonth[i] + commonYearMonthCount
-		anno := new(Anno)
-		if anno.year.stamp = uint64(i); !anno.isCommonYear() {
+		if anno := (&Anno{
+			year: year{
+				calendar: calendar[uint64]{
+					stamp: uint64(i),
+				},
+			},
+		}); !anno.isCommonYear() {
 			// 如果是闰年，额外增加一个月
 			yearCycleFirstmonthMonth[i+1]++
 		}
@@ -43,7 +51,7 @@ func yearCycleFirstmonthMonthCompute() {
 
 // 判断是否平年
 func (anno *Anno) isCommonYear() bool {
-	anno.year.IsCommon = !slices.Contains([]int8{1, 4, 7, 10, 13, 15, 18, 21, 24, 27}, int8(anno.year.stamp%yearCycle))
+	anno.year.IsCommon = !slices.Contains(leapYear, int8(anno.year.stamp%yearCycle))
 	return anno.year.IsCommon
 }
 
@@ -52,8 +60,13 @@ func monthCycleFirstdayDayCompute() {
 	monthCycleFirstdayDay[0] = 0
 	for i := range [monthCycle - 1]struct{}{} {
 		monthCycleFirstdayDay[i+1] = monthCycleFirstdayDay[i] + commonMonthDayCount
-		anno := new(Anno)
-		if anno.month.stamp = uint64(i); !anno.isCommonMonth() {
+		if anno := (&Anno{
+			month: month{
+				calendar: calendar[uint8]{
+					stamp: uint64(i),
+				},
+			},
+		}); !anno.isCommonMonth() {
 			// 如果是大月，额外增加一天
 			monthCycleFirstdayDay[i+1]++
 		}
@@ -62,12 +75,12 @@ func monthCycleFirstdayDayCompute() {
 
 // 判断是否小月
 func (anno *Anno) isCommonMonth() bool {
-	anno.month.IsCommon = !slices.Contains([]int8{1, 4, 8}, int8(anno.month.stamp%monthCycle))
+	anno.month.IsCommon = !slices.Contains(longMonth, int8(anno.month.stamp%monthCycle))
 	return anno.month.IsCommon
 }
 
 // 输出月数戳对应的年数戳，获取月对应的数字
-func (anno *Anno) getYearMonth() {
+func (anno *Anno) yearMonth() {
 	var (
 		yearCycleCount = anno.month.stamp / yearCycleMonthCount         // 闰年周期数
 		netMonth       = uint16(anno.month.stamp % yearCycleMonthCount) // 余下的不足一个周期的月数
@@ -88,7 +101,7 @@ func (anno *Anno) getYearMonth() {
 }
 
 // 输出天数戳对应的月数戳，获取日对应的数字
-func (anno *Anno) getMonthDay() {
+func (anno *Anno) monthDay() {
 	var (
 		monthCycleCount = anno.day.stamp / monthCycleDayCount         // 大月周期数
 		netDay          = uint16(anno.day.stamp % monthCycleDayCount) // 余下的不足一个周期的天数
@@ -106,23 +119,23 @@ func (anno *Anno) getMonthDay() {
 }
 
 // 将天数戳转换为完整的时间
-func (anno *Anno) toAnno() {
+func (anno *Anno) compute() {
 	s := anno.month.stamp
-	anno.getMonthDay()
-	anno.getDate()
+	anno.monthDay()
+	anno.date()
 	anno.chord.number = 1 + uint8(anno.day.stamp%9)
 	anno.chord.str = chordStrMap[anno.chord.number]
 	if anno.month.stamp == s {
 		return
 	}
 	s = anno.year.stamp
-	anno.getYearMonth()
-	anno.getMonth()
+	anno.yearMonth()
+	anno.monthInfo()
 	if anno.year.stamp == s {
 		return
 	}
 	anno.year.number = 1 + anno.year.stamp
-	anno.getYear()
+	anno.yearStr()
 	return
 }
 
@@ -135,7 +148,7 @@ func parseRune[T number](n T) rune {
 }
 
 // 将年份转换为年份字符串
-func (anno *Anno) getYear() {
+func (anno *Anno) yearStr() {
 	var (
 		c             int // c 为 0 表示个位，为 1 表示十位，以此类推
 		l             = len(strconv.FormatInt(int64(anno.year.number), 10))
@@ -155,7 +168,7 @@ func (anno *Anno) getYear() {
 }
 
 // 将月份转换为月份信息
-func (anno *Anno) getMonth() {
+func (anno *Anno) monthInfo() {
 	anno.month.str = monthInfoMap[anno.month.number].str
 	anno.month.elemental = monthInfoMap[anno.month.number].elemental
 	anno.month.imagery = monthInfoMap[anno.month.number].imagery
@@ -163,7 +176,7 @@ func (anno *Anno) getMonth() {
 }
 
 // 将日期转换为日期字符串
-func (anno *Anno) getDate() {
+func (anno *Anno) date() {
 	var ten rune
 	switch strconv.FormatInt(int64(anno.day.calendar.number)/10, 10) {
 	case `0`:
