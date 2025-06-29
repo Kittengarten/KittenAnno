@@ -14,8 +14,6 @@ const (
 	cycleGreaterMonthCount = 3                                                       // 每周期的大月数
 	yearCycleMonthCount    = yearCycle*commonYearMonthCount + cycleLeapYearCount     // 闰年周期的月数
 	monthCycleDayCount     = monthCycle*commonMonthDayCount + cycleGreaterMonthCount // 大月周期的天数
-
-	numberString = `〇一二三四五六七八九` // 数字对应的字符
 )
 
 var (
@@ -82,18 +80,14 @@ func (anno *Anno) isCommonMonth() bool {
 // 输出月数戳对应的年数戳，获取月对应的数字
 func (anno *Anno) yearMonth() {
 	var (
-		yearCycleCount = anno.month.stamp / yearCycleMonthCount         // 闰年周期数
-		netMonth       = uint16(anno.month.stamp % yearCycleMonthCount) // 余下的不足一个周期的月数
-		i              int                                              // 循环次数
+		netMonth = uint16(anno.month.stamp % yearCycleMonthCount) // 余下的不足一个周期的月数
+		i, ok    = slices.BinarySearch(yearCycleFirstmonthMonth[:], netMonth)
 	)
-	for i = range yearCycleFirstmonthMonth {
-		if netMonth < yearCycleFirstmonthMonth[i] {
-			i-- // 去除多余的一次循环
-			break
-		}
+	if !ok {
+		i-- // 未找到，去除多余的一次循环
 	}
-	anno.year.stamp = yearCycleCount*yearCycle + uint64(i)            // 年数戳
-	anno.month.number = uint8(netMonth - yearCycleFirstmonthMonth[i]) // 月份
+	anno.year.stamp = anno.month.stamp/yearCycleMonthCount*yearCycle + uint64(i) // 年数戳
+	anno.month.number = uint8(netMonth - yearCycleFirstmonthMonth[i])            // 月份
 	// 如果是平年，月份序号整体增加 1
 	if anno.isCommonYear() {
 		anno.month.number++
@@ -103,19 +97,14 @@ func (anno *Anno) yearMonth() {
 // 输出天数戳对应的月数戳，获取日对应的数字
 func (anno *Anno) monthDay() {
 	var (
-		monthCycleCount = anno.day.stamp / monthCycleDayCount         // 大月周期数
-		netDay          = uint16(anno.day.stamp % monthCycleDayCount) // 余下的不足一个周期的天数
-		i               int                                           // 循环次数
+		netDay = uint16(anno.day.stamp % monthCycleDayCount) // 余下的不足一个周期的天数
+		i, ok  = slices.BinarySearch(monthCycleFirstdayDay[:], netDay)
 	)
-	for i = range monthCycleFirstdayDay {
-		if netDay < monthCycleFirstdayDay[i] {
-			i-- // 去除多余的一次循环
-			break
-		}
+	if !ok {
+		i-- // 未找到，去除多余的一次循环
 	}
-	anno.month.stamp = monthCycleCount*monthCycle + uint64(i)             // 月数戳
-	anno.day.calendar.number = 1 + uint8(netDay-monthCycleFirstdayDay[i]) // 日期
-	return
+	anno.month.stamp = anno.day.stamp/monthCycleDayCount*monthCycle + uint64(i) // 月数戳
+	anno.day.calendar.number = 1 + uint8(netDay-monthCycleFirstdayDay[i])       // 日期
 }
 
 // 将天数戳转换为完整的时间
@@ -136,13 +125,12 @@ func (anno *Anno) compute() {
 	}
 	anno.year.number = 1 + anno.year.stamp
 	anno.yearStr()
-	return
 }
 
 // 将数字转换为中文数字
 func parseRune[T number](n T) rune {
 	if 0 <= n && 9 >= n {
-		return []rune(numberString)[n]
+		return []rune(`〇一二三四五六七八九`)[n]
 	}
 	return 0
 }
@@ -152,7 +140,7 @@ func (anno *Anno) yearStr() {
 	var (
 		c             int // c 为 0 表示个位，为 1 表示十位，以此类推
 		l             = len(strconv.FormatInt(int64(anno.year.number), 10))
-		yearConverted = make([]rune, l, l)
+		yearConverted = make([]rune, l)
 	)
 	for i := anno.year.number; 0 < i; i /= 10 {
 		v := i % 10
@@ -160,11 +148,12 @@ func (anno *Anno) yearStr() {
 		c++
 	}
 	slices.Reverse(yearConverted)
+	const wta = `世界树纪元`
 	if 1 == anno.year.number {
-		anno.year.str = `世界树纪元元年`
+		anno.year.str = wta + `元年`
 		return
 	}
-	anno.year.str = `世界树纪元` + string(yearConverted) + `年`
+	anno.year.str = wta + string(yearConverted) + `年`
 }
 
 // 将月份转换为月份信息
