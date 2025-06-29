@@ -149,7 +149,7 @@ func (anno *Anno) yearStr() {
 	}
 	slices.Reverse(yearConverted)
 	const wta = `世界树纪元`
-	if 1 == anno.year.number {
+	if anno.year.number == 1 {
 		anno.year.str = wta + `元年`
 		return
 	}
@@ -159,9 +159,9 @@ func (anno *Anno) yearStr() {
 // 将月份转换为月份信息
 func (anno *Anno) monthInfo() {
 	anno.month.str = monthInfoMap[anno.month.number].str
-	anno.month.elemental = monthInfoMap[anno.month.number].elemental
-	anno.month.imagery = monthInfoMap[anno.month.number].imagery
-	anno.month.flower = monthInfoMap[anno.month.number].flower
+	anno.elemental = monthInfoMap[anno.month.number].elemental
+	anno.imagery = monthInfoMap[anno.month.number].imagery
+	anno.flower = monthInfoMap[anno.month.number].flower
 }
 
 // 将日期转换为日期字符串

@@ -98,14 +98,19 @@ type (
 
 	// month 世界树纪元的月
 	month struct {
-		elemental, imagery, flower string // 月份的代表元灵及其意象、花卉
+		elemental string // 元灵
+		imagery   string // 意象
+		flower    string // 花卉
 		calendar[uint8]
 		IsCommon bool
 	}
 
 	// monthInfo 世界树纪元的月份信息
 	monthInfo struct {
-		str, elemental, imagery, flower string // 月份的文字表示、代表元灵及其意象、花卉
+		str       string // 文字
+		elemental string // 元灵
+		imagery   string // 意象
+		flower    string // 花卉
 	}
 
 	// 世界树纪元的日

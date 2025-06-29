@@ -26,10 +26,10 @@ func GetAnno() (Anno, error) {
 	t := time.Since(KittenTime) // 地球时间
 	mu.Lock()
 	defer mu.Unlock()
-	a.day.calendar.stamp = uint64(ratio * float64(t) / float64(wtaDay))
-	if a.day.calendar.stamp != ds {
+	a.day.stamp = uint64(ratio * float64(t) / float64(wtaDay))
+	if a.day.stamp != ds {
 		a.compute()
-		ds = a.day.calendar.stamp
+		ds = a.day.stamp
 	}
 	secondsToday := int32((ratio * (t % wtaDay) % wtaDay).Seconds())
 	a.second = uint8(secondsToday % secondsPerHour % secondsPerMinute)
